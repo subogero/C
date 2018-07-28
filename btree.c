@@ -5,7 +5,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#define N 100
+#define N 31
 
 struct t_bt {
 	struct t_bt *left;
@@ -17,7 +17,7 @@ struct t_bt {
 
 void print_leaf(int leaf, int level)
 {
-	printf("%5d height %2d\n", leaf, level);
+	printf("%5d level %2d\n", leaf, level);
 }
 
 /*
@@ -50,6 +50,7 @@ void calc_height(struct t_bt *bt)
  */
 struct t_bt *left_rotate(struct t_bt *bt)
 {
+	printf("%5d Rotate left\n", bt->leaf);
 	struct t_bt *root = bt->left;
 
 	bt->left = root->right;
@@ -66,6 +67,7 @@ struct t_bt *left_rotate(struct t_bt *bt)
  */
 struct t_bt *right_rotate(struct t_bt *bt)
 {
+	printf("%5d Rotate right\n", bt->leaf);
 	struct t_bt *root = bt->right;
 
 	bt->right = root->left;
@@ -89,7 +91,9 @@ struct t_bt *insert_bt(struct t_bt *bt, int leaf, int level)
 		level--;
 		bt->leaf = leaf;
 		bt->has_leaf = 1;
+		printf("%5d Insert\n", leaf);
 	} else if (leaf < bt->leaf) {
+		printf("%5d Pass left\n", leaf);
 		bt->left = insert_bt(bt->left, leaf, level);
 		/* Balance if necessary */
 		char r_height = bt->right ? bt->right->height : -1;
@@ -99,11 +103,12 @@ struct t_bt *insert_bt(struct t_bt *bt, int leaf, int level)
 			return left_rotate(bt);
 		}
 	} else {
+		printf("%5d Pass right\n", leaf);
 		bt->right = insert_bt(bt->right, leaf, level);
 		/* Balance if necessary */
 		char l_height = bt->left ? bt->left->height : -1;
 		if (bt->right->height >= l_height + 2) {
-			if (leaf >= bt->right->leaf)
+			if (leaf < bt->right->leaf)
 				bt->right = left_rotate(bt->right);
 			return right_rotate(bt);
 		}
@@ -135,11 +140,11 @@ int main(int argc, char *argv[])
 	for (i = 0; i < N; ++i) {
 		arr[i] = 0;
 		read(fd_rand, arr + i, 2);
-		insert_bt(bt, arr[i], 0);
+		bt = insert_bt(bt, arr[i], 0);
 	}
 	close(fd_rand);
-
-	printf("\nDepth-first traversal\n");
+	printf("=== Depth-first traversal\n");
 	dtravers_bt(bt, 0, &print_leaf);
+
 	return 0;
 }
