@@ -83,13 +83,13 @@ struct t_bt *right_rotate(struct t_bt *bt)
 struct t_bt *insert_bt(struct t_bt *bt, int leaf, int level)
 {
 	level++;
+	if (bt == NULL)
+		bt = create_bt();
 	if (!bt->has_leaf) {
 		level--;
 		bt->leaf = leaf;
 		bt->has_leaf = 1;
 	} else if (leaf < bt->leaf) {
-		if (bt->left == NULL)
-			bt->left = create_bt();
 		bt->left = insert_bt(bt->left, leaf, level);
 		/* Balance if necessary */
 		char r_height = bt->right ? bt->right->height : -1;
@@ -99,8 +99,6 @@ struct t_bt *insert_bt(struct t_bt *bt, int leaf, int level)
 			return left_rotate(bt);
 		}
 	} else {
-		if (bt->right == NULL)
-			bt->right = create_bt();
 		bt->right = insert_bt(bt->right, leaf, level);
 		/* Balance if necessary */
 		char l_height = bt->left ? bt->left->height : -1;
