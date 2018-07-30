@@ -131,6 +131,24 @@ void dtravers_bt(struct t_bt *bt, int level, void (*fn)(int, int))
 	dtravers_bt(bt->right, level+1, fn);
 }
 
+/*
+ * Search btree, return node with searched number
+ */
+struct t_bt *search_bt(struct t_bt *bt, int val)
+{
+	if (bt == NULL)
+		return NULL;
+	if (bt->leaf == val)
+		return bt;
+	struct t_bt *left_hit = search_bt(bt->left, val);
+	if (left_hit != NULL)
+		return left_hit;
+	struct t_bt *right_hit = search_bt(bt->right, val);
+	if (right_hit != NULL)
+		return right_hit;
+	return NULL;
+}
+
 int main(int argc, char *argv[])
 {
 	struct t_bt *bt = create_bt();
@@ -143,8 +161,13 @@ int main(int argc, char *argv[])
 		bt = insert_bt(bt, arr[i], 0);
 	}
 	close(fd_rand);
+
 	printf("=== Depth-first traversal\n");
 	dtravers_bt(bt, 0, &print_leaf);
+
+	printf("=== Search %5d\n", arr[N/2]);
+	struct t_bt *hit = search_bt(bt, arr[N/2]);
+	printf("%5d found\n", hit != NULL ? hit->leaf : -1);
 
 	return 0;
 }
