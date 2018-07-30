@@ -149,6 +149,24 @@ struct t_bt *search_bt(struct t_bt *bt, int val)
 	return NULL;
 }
 
+/*
+ * Search for min/max value in btree
+ */
+struct t_bt *search_min(struct t_bt *bt)
+{
+	return
+		bt == NULL ? NULL :
+		bt->left == NULL ? bt :
+		search_min(bt->left);
+}
+struct t_bt *search_max(struct t_bt *bt)
+{
+	return
+		bt == NULL ? NULL :
+		bt->right == NULL ? bt :
+		search_max(bt->right);
+}
+
 int main(int argc, char *argv[])
 {
 	struct t_bt *bt = create_bt();
@@ -169,5 +187,7 @@ int main(int argc, char *argv[])
 	struct t_bt *hit = search_bt(bt, arr[N/2]);
 	printf("%5d found\n", hit != NULL ? hit->leaf : -1);
 
+	printf("=== Min %5d\n", search_min(bt)->leaf);
+	printf("=== Max %5d\n", search_max(bt)->leaf);
 	return 0;
 }
